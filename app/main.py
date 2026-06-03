@@ -6,7 +6,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from mangum import Mangum
 
-from app.s3_env import read_env, write_env
+from app.s3_env import read_env, write_env, backup_env
 from app.auth import create_cookie, verify_cookie, get_current_username
 
 app = FastAPI()
@@ -55,10 +55,8 @@ def get_env(username: str = Depends(get_current_username)):
 
 @app.post("/env")
 def update_env(payload: dict, username: str = Depends(get_current_username)):
-    current = read_env()
-    for key, value in payload.items():
-        current[key] = str(value)
-    write_env(current)
+    backup_env()
+    write_env(payload)
     return {
         "message": "updated",
         "updated_keys": list(payload.keys())

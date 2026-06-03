@@ -81,8 +81,16 @@ function save() {
         }
     }
     
+    // Check for deleted keys
+    for (const key of Object.keys(originalData)) {
+        if (!(key in pendingPayload)) {
+            changes.push(`<div class="diff-removed">- ${key}=${originalData[key]}</div>`);
+        }
+    }
+    
     if (changes.length === 0) {
-        changes.push('<div class="diff-none">No variables were added or modified.</div>');
+        showToast('No changes detected. Nothing to save.', 'success');
+        return;
     }
     
     diffContainer.innerHTML = changes.join('');

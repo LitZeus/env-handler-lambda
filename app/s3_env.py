@@ -1,11 +1,27 @@
 import os
 import boto3
+import datetime
 from botocore.exceptions import ClientError
 
 s3 = boto3.client("s3")
 
 BUCKET = os.environ["S3_BUCKET"]
 KEY = os.environ["S3_KEY"]
+
+
+def backup_env():
+    try:
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        s3.copy_object(
+            Bucket=BUCKET,
+            CopySource={'Bucket': BUCKET, 'Key': KEY},
+            Key=f"{KEY}_{timestamp}"
+        )
+    except ClientError as e:
+        if e.response["Error"]["Code"] == "NoSuchKey":
+            pass
+        else:
+            raise
 
 
 def read_env():
