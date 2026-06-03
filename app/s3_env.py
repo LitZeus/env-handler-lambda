@@ -11,7 +11,7 @@ KEY = os.environ["S3_KEY"]
 
 def backup_env():
     try:
-        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         s3.copy_object(
             Bucket=BUCKET,
             CopySource={'Bucket': BUCKET, 'Key': KEY},
