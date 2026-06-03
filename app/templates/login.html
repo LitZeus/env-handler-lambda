@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - ENV Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .login-container {
+            max-width: 400px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        input:focus {
+            border-color: var(--primary);
+        }
+        .login-btn {
+            width: 100%;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        #login-error {
+            color: var(--danger);
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-animation"></div>
+    <div class="container login-container">
+        <header>
+            <h1>ENV Manager</h1>
+            <p>Authentication Required</p>
+        </header>
+
+        <main>
+            <div class="editor-container" style="flex-direction: column;">
+                <form id="login-form" onsubmit="event.preventDefault(); doLogin();">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" required autocomplete="username">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" required autocomplete="current-password">
+                    </div>
+                    
+                    <div id="login-error">Invalid username or password.</div>
+                    
+                    <button type="submit" class="login-btn" id="login-btn">
+                        <span class="btn-text">Log In</span>
+                        <span class="loader" id="login-loader"></span>
+                    </button>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        async function doLogin() {
+            const btn = document.getElementById('login-btn');
+            const loader = document.getElementById('login-loader');
+            const btnText = btn.querySelector('.btn-text');
+            const errorDiv = document.getElementById('login-error');
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            btn.disabled = true;
+            loader.style.display = 'inline-block';
+            btnText.textContent = 'Logging in...';
+            errorDiv.style.display = 'none';
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                if (response.ok) {
+                    window.location.href = '/';
+                } else {
+                    errorDiv.style.display = 'block';
+                    btn.disabled = false;
+                    loader.style.display = 'none';
+                    btnText.textContent = 'Log In';
+                }
+            } catch (err) {
+                errorDiv.textContent = 'An error occurred. Please try again.';
+                errorDiv.style.display = 'block';
+                btn.disabled = false;
+                loader.style.display = 'none';
+                btnText.textContent = 'Log In';
+            }
+        }
+    </script>
+</body>
+</html>
