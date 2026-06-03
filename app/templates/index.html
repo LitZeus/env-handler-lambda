@@ -20,6 +20,12 @@
         </header>
 
         <main>
+            <div class="file-selector" style="margin-bottom: 1.5rem; width: 100%;">
+                <label for="env-selector" style="display: block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.95rem;">Target Environment File:</label>
+                <select id="env-selector" onchange="loadSelectedEnv()" style="width: 100%; padding: 0.8rem 1rem; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-main); border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 1rem; outline: none; cursor: pointer;">
+                </select>
+            </div>
+            
             <div class="editor-container">
                 <textarea id="envs" spellcheck="false" placeholder="Loading..."></textarea>
             </div>

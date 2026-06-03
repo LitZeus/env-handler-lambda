@@ -8,17 +8,63 @@ const diffContainer = document.getElementById('diff-container');
 
 let originalData = {};
 let pendingPayload = {};
+let currentKey = '';
 
 async function load() {
     try {
-        const response = await fetch('/env');
+        const response = await fetch('/list-envs');
+        if (!response.ok) {
+            if (response.status === 401) {
+                window.location.href = '/login';
+                return;
+            }
+            throw new Error('Failed to load env list');
+        }
+        
+        const data = await response.json();
+        const selector = document.getElementById('env-selector');
+        
+        if (data.keys.length === 0) {
+            envsTextarea.value = "# No environment files configured.\n# Please set the S3_KEYS environment variable in your Lambda configuration.";
+            envsTextarea.disabled = true;
+            saveBtn.disabled = true;
+            return;
+        }
+        
+        data.keys.forEach(k => {
+            const opt = document.createElement('option');
+            opt.value = k;
+            opt.textContent = k;
+            selector.appendChild(opt);
+        });
+        
+        currentKey = data.keys[0];
+        await loadSelectedEnv();
+    } catch (error) {
+        console.error('Error loading env list:', error);
+        envsTextarea.value = "# Error loading environment list";
+    }
+}
+
+async function loadSelectedEnv() {
+    const selector = document.getElementById('env-selector');
+    if (selector.value) {
+        currentKey = selector.value;
+    }
+    
+    envsTextarea.value = "Loading...";
+    envsTextarea.disabled = true;
+    saveBtn.disabled = true;
+    
+    try {
+        const response = await fetch(`/env?key=${encodeURIComponent(currentKey)}`);
         
         if (!response.ok) {
             if (response.status === 401) {
                 window.location.href = '/login';
                 return;
             }
-            throw new Error('Failed to load');
+            throw new Error('Failed to load env');
         }
         
         const data = await response.json();
@@ -30,9 +76,11 @@ async function load() {
         }
         
         envsTextarea.value = text;
+        envsTextarea.disabled = false;
+        saveBtn.disabled = false;
     } catch (error) {
-        console.error('Error loading envs:', error);
-        envsTextarea.value = "# Error loading environment variables";
+        console.error('Error loading env:', error);
+        envsTextarea.value = `# Error loading environment variables for ${currentKey}`;
     }
 }
 
@@ -71,7 +119,6 @@ function save() {
 
     const changes = [];
     
-    // Check for changed or added keys
     for (const [key, value] of Object.entries(pendingPayload)) {
         if (!(key in originalData)) {
             changes.push(`<div class="diff-added">+ ${key}=${value}</div>`);
@@ -81,7 +128,6 @@ function save() {
         }
     }
     
-    // Check for deleted keys
     for (const key of Object.keys(originalData)) {
         if (!(key in pendingPayload)) {
             changes.push(`<div class="diff-removed">- ${key}=${originalData[key]}</div>`);
@@ -106,7 +152,7 @@ async function confirmSave() {
     setSavingState(true);
     
     try {
-        const response = await fetch('/env', {
+        const response = await fetch(`/env?key=${encodeURIComponent(currentKey)}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -132,5 +178,4 @@ async function confirmSave() {
     }
 }
 
-// Init
 document.addEventListener('DOMContentLoaded', load);

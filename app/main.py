@@ -6,7 +6,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from mangum import Mangum
 
-from app.s3_env import read_env, write_env, backup_env
+from app.s3_env import read_env, write_env, backup_env, AVAILABLE_KEYS
 from app.auth import create_cookie, verify_cookie, get_current_username
 
 app = FastAPI()
@@ -48,15 +48,24 @@ def login_api(payload: dict, response: Response):
     return {"message": "Success"}
 
 
+@app.get("/list-envs")
+def list_envs(username: str = Depends(get_current_username)):
+    return {"keys": AVAILABLE_KEYS}
+
+
 @app.get("/env")
-def get_env(username: str = Depends(get_current_username)):
-    return read_env()
+def get_env(key: str, username: str = Depends(get_current_username)):
+    if key not in AVAILABLE_KEYS:
+        raise HTTPException(status_code=400, detail="Invalid environment key")
+    return read_env(key)
 
 
 @app.post("/env")
-def update_env(payload: dict, username: str = Depends(get_current_username)):
-    backup_env()
-    write_env(payload)
+def update_env(key: str, payload: dict, username: str = Depends(get_current_username)):
+    if key not in AVAILABLE_KEYS:
+        raise HTTPException(status_code=400, detail="Invalid environment key")
+    backup_env(key)
+    write_env(key, payload)
     return {
         "message": "updated",
         "updated_keys": list(payload.keys())
