@@ -35,6 +35,21 @@
         </main>
     </div>
 
+    <!-- Confirmation Modal -->
+    <div id="confirm-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 style="margin-bottom: 0.5rem">Confirm Changes</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Review the variables that will be updated before saving.</p>
+            
+            <div id="diff-container"></div>
+            
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+                <button class="btn-confirm" onclick="confirmSave()">Confirm & Save</button>
+            </div>
+        </div>
+    </div>
+
     <script src="/static/app.js"></script>
 </body>
 </html>

@@ -3,6 +3,11 @@ const saveBtn = document.getElementById('save-btn');
 const btnText = document.querySelector('.btn-text');
 const loader = document.getElementById('loader');
 const toast = document.getElementById('toast');
+const confirmModal = document.getElementById('confirm-modal');
+const diffContainer = document.getElementById('diff-container');
+
+let originalData = {};
+let pendingPayload = {};
 
 async function load() {
     try {
@@ -17,8 +22,9 @@ async function load() {
         }
         
         const data = await response.json();
-        let text = '';
+        originalData = { ...data };
         
+        let text = '';
         for (const [key, value] of Object.entries(data)) {
             text += `${key}=${value}\n`;
         }
@@ -46,9 +52,9 @@ function setSavingState(isSaving) {
     loader.style.display = isSaving ? 'inline-block' : 'none';
 }
 
-async function save() {
+function save() {
     const raw = envsTextarea.value;
-    const payload = {};
+    pendingPayload = {};
     
     raw.split('\n').forEach(line => {
         line = line.trim();
@@ -60,9 +66,35 @@ async function save() {
         const key = parts[0].trim();
         const value = parts.slice(1).join('=');
         
-        payload[key] = value;
+        pendingPayload[key] = value;
     });
 
+    const changes = [];
+    
+    // Check for changed or added keys
+    for (const [key, value] of Object.entries(pendingPayload)) {
+        if (!(key in originalData)) {
+            changes.push(`<div class="diff-added">+ ${key}=${value}</div>`);
+        } else if (originalData[key] !== value) {
+            changes.push(`<div class="diff-removed">- ${key}=${originalData[key]}</div>`);
+            changes.push(`<div class="diff-changed">~ ${key}=${value}</div>`);
+        }
+    }
+    
+    if (changes.length === 0) {
+        changes.push('<div class="diff-none">No variables were added or modified.</div>');
+    }
+    
+    diffContainer.innerHTML = changes.join('');
+    confirmModal.classList.add('show');
+}
+
+function closeModal() {
+    confirmModal.classList.remove('show');
+}
+
+async function confirmSave() {
+    closeModal();
     setSavingState(true);
     
     try {
@@ -71,7 +103,7 @@ async function save() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(pendingPayload)
         });
         
         if (!response.ok) {
@@ -83,6 +115,7 @@ async function save() {
         }
         
         showToast('Settings saved successfully!');
+        originalData = { ...originalData, ...pendingPayload };
     } catch (error) {
         console.error('Error saving envs:', error);
         showToast('Failed to save settings.', 'error');
