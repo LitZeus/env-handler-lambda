@@ -6,8 +6,8 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from mangum import Mangum
 
-from s3_env import read_env, write_env
-from auth import create_cookie, verify_cookie, get_current_username
+from app.s3_env import read_env, write_env
+from app.auth import create_cookie, verify_cookie, get_current_username
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
