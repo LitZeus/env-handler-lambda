@@ -15,6 +15,8 @@ env:
   AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
   ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY || 'env-handler' }}
   LAMBDA_FUNCTION_NAME: ${{ vars.LAMBDA_FUNCTION_NAME || 'env-handler' }}
+  S3_BUCKET: ${{ vars.S3_BUCKET }}
+  S3_KEY: ${{ vars.S3_KEY }}
 
 jobs:
   deploy:
@@ -57,7 +59,16 @@ jobs:
             --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
             --image-uri $IMAGE_URI
             
-          echo "Waiting for Lambda function to complete the update..."
+          echo "Waiting for Lambda function to complete the code update..."
+          aws lambda wait function-updated \
+            --function-name ${{ env.LAMBDA_FUNCTION_NAME }}
+            
+          echo "Updating Lambda function configuration (Environment Variables)..."
+          aws lambda update-function-configuration \
+            --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
+            --environment "Variables={S3_BUCKET=${{ env.S3_BUCKET }},S3_KEY=${{ env.S3_KEY }}}"
+            
+          echo "Waiting for Lambda function to complete the configuration update..."
           aws lambda wait function-updated \
             --function-name ${{ env.LAMBDA_FUNCTION_NAME }}
             
