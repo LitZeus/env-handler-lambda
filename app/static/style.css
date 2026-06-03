@@ -278,3 +278,79 @@ button:disabled {
     color: white;
     border-color: white;
 }
+
+/* Row-based Editor Styles */
+.env-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    align-items: center;
+}
+.env-input {
+    flex: 1;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--glass-border);
+    color: var(--text-main);
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+.env-input.key {
+    flex: 0.4;
+}
+.env-input:focus {
+    border-color: var(--primary);
+}
+.btn-delete {
+    background: transparent;
+    border: none;
+    color: var(--danger);
+    cursor: pointer;
+    padding: 0.5rem;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    font-size: 1.5rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-delete:hover {
+    opacity: 1;
+}
+.btn-add {
+    background: rgba(255,255,255,0.05);
+    border: 1px dashed var(--glass-border);
+    color: var(--text-muted);
+    padding: 0.8rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    width: 100%;
+    margin-top: 0.5rem;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+}
+.btn-add:hover {
+    background: rgba(255,255,255,0.1);
+    color: var(--text-main);
+    border-color: var(--text-muted);
+}
+.btn-logout {
+    background: transparent;
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+.btn-logout:hover {
+    background: var(--danger);
+    color: white;
+}

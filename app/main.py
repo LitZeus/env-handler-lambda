@@ -44,7 +44,12 @@ def login_api(payload: dict, response: Response):
         )
         
     cookie_val = create_cookie(username)
-    response.set_cookie(key="session_token", value=cookie_val, httponly=True)
+    response.set_cookie(key="session_token", value=cookie_val, httponly=True, max_age=14400)
+    return {"message": "Success"}
+
+@app.post("/api/logout")
+def logout_api(response: Response):
+    response.delete_cookie(key="session_token")
     return {"message": "Success"}
 
 

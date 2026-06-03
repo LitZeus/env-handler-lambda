@@ -23,7 +23,7 @@ def verify_cookie(cookie: str):
         expected_signature = hmac.new(SECRET_KEY.encode(), f"{username}:{timestamp}".encode(), hashlib.sha256).hexdigest()
         if not secrets.compare_digest(signature, expected_signature):
             return None
-        if int(time.time()) - int(timestamp) > 86400: # 24 hours expiry
+        if int(time.time()) - int(timestamp) > 14400: # 4 hours expiry
             return None
         return username
     except Exception:

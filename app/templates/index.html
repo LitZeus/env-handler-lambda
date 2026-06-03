@@ -14,9 +14,12 @@
 <body>
     <div class="background-animation"></div>
     <div class="container">
-        <header>
-            <h1>Environment Variables</h1>
-            <p>Manage your AWS S3 environment configuration securely</p>
+        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <h1 style="margin-bottom: 0.5rem;">Environment Variables</h1>
+                <p style="margin: 0; color: var(--text-muted);">Manage your AWS S3 environment configuration securely</p>
+            </div>
+            <button onclick="logout()" class="btn-logout">Log out</button>
         </header>
 
         <main>
@@ -26,12 +29,15 @@
                 </select>
             </div>
             
-            <div class="editor-container">
-                <textarea id="envs" spellcheck="false" placeholder="Loading..."></textarea>
+            <div class="editor-container" id="editor-container">
+                <div id="env-rows">
+                    <div style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading...</div>
+                </div>
+                <button class="btn-add" id="btn-add-var" onclick="addEnvRow('', '')" style="display: none;">+ Add Variable</button>
             </div>
             
             <div class="actions">
-                <button id="save-btn" onclick="save()">
+                <button id="save-btn" onclick="save()" disabled>
                     <span class="btn-text">Save Changes</span>
                     <span class="loader" id="loader"></span>
                 </button>
